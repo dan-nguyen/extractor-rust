@@ -1,6 +1,6 @@
 # extractor-rust
 
-A command-line tool that reads EXIF metadata from a directory of images and prints a focal length frequency chart.
+A command-line tool that reads EXIF metadata from a directory of images and prints frequency charts for focal length, camera model, and lens.
 
 This is a Rust rewrite of the original [ExifReader Java project](https://github.com/dan-nguyen/extractor), updated to support a wider range of camera formats.
 
@@ -12,7 +12,7 @@ This is a Rust rewrite of the original [ExifReader Java project](https://github.
 - **Format deduplication** — when a shoot produces paired files (e.g. `IMG_1234.RAW` + `IMG_1234.JPG`), the highest-priority format is read once per shot, avoiding double-counting
 - **Parallel scanning** — walks directories and reads EXIF concurrently across all CPU cores
 - **Progress bar** — shows live progress, elapsed time, and ETA during scanning
-- **Bar chart output** — focal lengths sorted by frequency with a scaled ASCII bar chart
+- **Bar chart output** — focal length, camera model, and lens sorted by frequency with scaled ASCII bar charts
 
 ## Setup
 
@@ -30,7 +30,7 @@ This is a Rust rewrite of the original [ExifReader Java project](https://github.
 ## Usage
 
 ```
-./target/release/extractor-rust /path/to/images
+./target/release/extractor-rust /path/to/images [path2 ...]
 ```
 
 To list files that could not be read:
@@ -52,6 +52,18 @@ Focal Length Frequency Counter:
   24mm  ████████████████████████████████████████  139
   70mm  ████████████████████████████              97
   68mm  ██████                                    13
+  ...
+
+Camera Frequency Counter:
+
+  Sony ILCE-7M4  ████████████████████████████████████████  312
+  DJI Osmo Pocket  ████                                    24
+  ...
+
+Lens Frequency Counter:
+
+  FE 24-70mm F2.8 GM  ████████████████████████████████████████  287
+  FE 70-200mm F2.8 GM  ████████████                            89
   ...
 
 Skipped 12 file(s) with unreadable EXIF (run with --verbose to list them)
