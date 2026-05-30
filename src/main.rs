@@ -29,18 +29,23 @@ type FileResult = (Option<String>, Option<String>);
 fn main() {
     let args: Vec<String> = env::args().collect();
     let verbose = args.iter().any(|a| a == "--verbose" || a == "-v");
-    let dir_path = args.iter()
+    let dir_paths: Vec<&str> = args.iter()
         .skip(1)
-        .find(|a| !a.starts_with('-'))
-        .cloned()
-        .unwrap_or_else(|| "/Path/To/Images/".to_string());
+        .filter(|a| !a.starts_with('-'))
+        .map(|s| s.as_str())
+        .collect();
+
+    if dir_paths.is_empty() {
+        eprintln!("Usage: extractor-rust <path> [path...] [--verbose]");
+        return;
+    }
 
     // jwalk traverses the directory tree in parallel across rayon threads.
     // Deduplication by (parent_dir, stem): keep only the highest-priority extension per shot.
     // Keying by parent ensures DSC00001 in two different folders are treated as separate shots.
     let mut by_stem: HashMap<(PathBuf, String), PathBuf> = HashMap::new();
-    for entry in WalkDir::new(&dir_path)
-        .into_iter()
+    for entry in dir_paths.iter()
+        .flat_map(|dir| WalkDir::new(dir).into_iter())
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_file())
     {
